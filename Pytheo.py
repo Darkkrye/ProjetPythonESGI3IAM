@@ -30,7 +30,7 @@ def onPostalCodeSelected(value):
 
     cities = []
     for x in range(0, len(cities_obj["cities"])):
-        cities.append(cities_obj["cities"][x]["city"].lower())
+        cities.append(cities_obj["cities"][x]["city"].capitalize())
         
     entry = ace.AutocompleteEntry(cities, main)
     entry.grid(row=0, column=5)

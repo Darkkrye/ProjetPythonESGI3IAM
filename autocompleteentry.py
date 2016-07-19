@@ -9,9 +9,8 @@ except ImportError:
     from tkinter import *   ## notice here too
 import re
 class AutocompleteEntry(Entry):
+    
     def __init__(self, lista, *args, **kwargs):
-
-        
         
         Entry.__init__(self, *args, **kwargs)
         self.lista = lista
@@ -88,14 +87,18 @@ class AutocompleteEntry(Entry):
                 self.lb.selection_clear(first=index)
                 index = str(int(index)+1)        
                 self.lb.selection_set(first=index)
-                self.lb.activate(index) 
+                self.lb.activate(index)
 
     def comparison(self):
-        pattern = re.compile('.*' + self.var.get() + '.*')
-        return [w for w in self.lista if re.match(pattern, w)]
+        if isPostalCode(self.var.get()):
+            pattern = re.compile('.*' + self.var.get() + '.*')
+            return [w for w in self.lista if re.match(pattern, w)]
+        else:
+            pattern = re.compile('.*' + re.escape(self.var.get()) + '.*', re.IGNORECASE)
+            return [ w for w in self.lista if re.match(pattern, w) ]
 
 def isPostalCode(s):
-    try: 
+    try:
         int(s)
         return True
     except ValueError:
