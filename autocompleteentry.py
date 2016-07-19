@@ -55,8 +55,8 @@ class AutocompleteEntry(Entry):
 
         if self.lb_up:
             self.var.set(self.lb.get(ACTIVE))
-            if isPostalCode(self.lb.get(ACTIVE)):
-                onPostalCodeSelected(self.lb.get(ACTIVE))
+            if isZipCode(self.lb.get(ACTIVE)):
+                onZipCodeSelected(self.lb.get(ACTIVE))
             else:
                 onCitySelected(self.lb.get(ACTIVE).capitalize())
             self.lb.destroy()
@@ -90,14 +90,14 @@ class AutocompleteEntry(Entry):
                 self.lb.activate(index)
 
     def comparison(self):
-        if isPostalCode(self.var.get()):
+        if isZipCode(self.var.get()):
             pattern = re.compile('.*' + self.var.get() + '.*')
             return [w for w in self.lista if re.match(pattern, w)]
         else:
             pattern = re.compile('.*' + re.escape(self.var.get()) + '.*', re.IGNORECASE)
             return [ w for w in self.lista if re.match(pattern, w) ]
 
-def isPostalCode(s):
+def isZipCode(s):
     try:
         int(s)
         return True

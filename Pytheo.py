@@ -9,20 +9,17 @@ except ImportError:
     from tkinter import *   ## notice here too
 import re
 import autocompleteentry as ace
+import modelDetailedDayWeather as mddw
+import modelAllDayWeather as madw
 from urllib.request import urlopen
 import json
 
-# POUR TESTER : 1er input => 2714 (double clic sur le bon dans la liste) / 2ème input => r (double clic sur n'importe lequel dans la liste
+# - CONSTANTS
+WG_KEY = "e9cf1566c008b39f"
 
-response = urlopen("https://gist.githubusercontent.com/Darkkrye/f69af450328241820083b311cd654641/raw/83294d623756be064399390305833e386c168f7d/frenchPostalCodes.json")
-string = response.read().decode('utf-8')
-json_obj = json.loads(string)
-
-postalCodes = []
-for x in range(0, len(json_obj)):
-    postalCodes.append(json_obj[x]["codePostal"])
-
-def onPostalCodeSelected(value):
+# - REDEFINE FUNCTIONS
+# Functions
+def onZipCodeSelected(value):
     url = "http://vicopo.selfbuild.fr/cherche/" + value
     cities_response = urlopen(url)
     cities_string = cities_response.read().decode('utf-8')
@@ -31,22 +28,62 @@ def onPostalCodeSelected(value):
     cities = []
     for x in range(0, len(cities_obj["cities"])):
         cities.append(cities_obj["cities"][x]["city"].capitalize())
-        
-    entry = ace.AutocompleteEntry(cities, main)
-    entry.grid(row=0, column=5)
+
+    Label(cadre, text="Puis la ville :").pack(side="top", fill=X)
+    entry = ace.AutocompleteEntry(cities, cadre).pack(side="top", fill=Y)
 
 def onCitySelected(value):
-    print("Vous avez sélectionné : ", value)
+    url = "http://api.wunderground.com/api/" + WG_KEY + "/forecast/lang:FR/q/France/" + value + ".json"
+    weather_response = urlopen(url)
+    weather_string = weather_response.read().decode('utf-8')
+    weather_json_obj = json.loads(weather_string)
 
-ace.onPostalCodeSelected = onPostalCodeSelected
+    detailed_day_weather = []
+    all_day_weather = []
+
+    for i in range(0, len(weather_json_obj["forecast"]["txt_forecast"]["forecastday"]), 2):
+        day = weather_json_obj["forecast"]["txt_forecast"]["forecastday"][i]
+        evening = weather_json_obj["forecast"]["txt_forecast"]["forecastday"][i+1]
+        weather = mddw.DetailedDayWeather(day["icon_url"], day["title"], day["fcttext_metric"], evening["icon_url"], evening["title"], evening["fcttext_metric"])
+        detailed_day_weather.append(weather)
+
+    for j in range(0, len(weather_json_obj["forecast"]["simpleforecast"]["forecastday"])):
+        day = weather_json_obj["forecast"]["simpleforecast"]["forecastday"][j]
+        weather = madw.AllDayWeather(day["date"]["day"], day["date"]["weekday"], day["date"]["month"], day["date"]["monthname"], day["date"]["year"], day["high"]["celsius"], day["low"]["celsius"], day["conditions"], day["icon_url"], day["maxwind"]["kph"], day["maxwind"]["dir"], day["avewind"]["kph"], day["avewind"]["dir"], day["maxhumidity"], day["minhumidity"], day["avehumidity"])
+        all_day_weather.append(weather)
+
+# Setting redefinitions
+ace.onZipCodeSelected = onZipCodeSelected
 ace.onCitySelected = onCitySelected
 
+
+# - PRE-LAUNCH CODE :
+# Get all zip codes
+response = urlopen("https://gist.githubusercontent.com/Darkkrye/f69af450328241820083b311cd654641/raw/ffeeb16776565a8dd612f0ec076f1946d0e5b4aa/frenchZipCodes.json")
+string = response.read().decode('utf-8')
+json_obj = json.loads(string)
+
+zipCodes = []
+for x in range(0, len(json_obj)):
+    zipCodes.append(json_obj[x]["codePostal"])
+
+
+# - LAUNCH CODE
 if __name__ == '__main__':
     main = Tk()
     main.title("Pythéo")
     main.geometry("1000x500")
 
-    entry = ace.AutocompleteEntry(postalCodes, main)
-    entry.grid(row=0, column=0)
+    cadre = Frame(main, width=768, height=576, borderwidth=1)
+    cadre.pack(fill=BOTH)
+
+    Label(cadre, text="Bienvenue dans Pythéo").pack(side="top", fill=X)
+
+    Label(cadre, text="Veuillez sélectionner le Code Postal :").pack(side="top", fill=X)
+    entry = ace.AutocompleteEntry(zipCodes, cadre).pack(side="top", fill=Y)
 
     main.mainloop()
+
+
+
+# POUR TESTER : 1er input => 2714 (double clic sur le bon dans la liste) / 2ème input => r (double clic sur n'importe lequel dans la liste
