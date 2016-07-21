@@ -44,26 +44,59 @@ if __name__ == '__main__':
 
     Label(cadre, text="Bienvenue dans Pythéo").pack(side="top", fill=X)
 
-    images1 = []
-    images2 = []
+    i_a_d = []
+    i_d_d_d = []
+    i_d_d_e = []
 
-    for i in range(0, len(detailed_day_weather)):
-        weather = detailed_day_weather[i]
-        print(weather.day_icon_url, " / ", weather.day_title, " / ", weather.day_description, " / ", weather.eve_icon_url, " / ", weather.eve_title, " / ", weather.eve_description, "\n")
-
-        raw_data = urlopen(weather.day_icon_url).read()
+    for i in range(0, len(all_day_weather)):
+        adw = all_day_weather[i]
+        raw_data = urlopen(adw.icon_url).read()
         im = Image.open(BytesIO(raw_data))
-        images1.append(ImageTk.PhotoImage(im))
-
-        raw_data2 = urlopen(weather.eve_icon_url).read()
-        im2 = Image.open(BytesIO(raw_data2))
-        images2.append(ImageTk.PhotoImage(im2))
+        i_a_d.append(ImageTk.PhotoImage(im))
 
         canvas = Canvas(cadre, width=250, height=400)
-        canvas.create_rectangle(10, 25, 225, 400)
-        canvas.create_image(10,25, anchor = NW, image=images1[i])
-        canvas.create_image(175,25, anchor = NW, image=images2[i])
+        canvas.create_rectangle(10, 25, 225, 400, fill="#3131ce")
+        canvas.create_image(100,25, anchor=NW, image=i_a_d[i])
+        print(i_a_d[i])
+        
+        date = adw.day_name + " " + str(adw.day_date) + " " + adw.month_name + " " + str(adw.year_date) + " (" + str(adw.day_date) + "/" + str(adw.month_date) + "/" + str(adw.year_date) + ")"
+        canvas.create_text(120, 100, text=date, fill="white")
+
+        temperature = "Temperature (max/min): " + str(adw.max_temp) + "°C / " + str(adw.min_temp) + "°C"
+        canvas.create_text(120, 125, text=temperature, fill="white")
+
+        canvas.create_text(120, 150, text=adw.description, fill="white")
+
+        max_wind = "Vent max (vit/dir): " + str(adw.max_wind_speed) + "km/h / " + adw.max_wind_dir
+        ave_wind = "Vent moyen (vit/dir): " + str(adw.ave_wind_speed) + "km/h / " + adw.ave_wind_dir
+        canvas.create_text(120, 175, text=max_wind, fill="white")
+        canvas.create_text(120, 200, text=ave_wind, fill="white")
+
+        if adw.max_hum == 0 and adw.min_hum == 0:
+            hum = "Humidité : " + str(adw.ave_hum) + "%"
+        else:
+            hum = "Humidité (max/min) : " + str(adw.max_hum) + "%/" + str(adw.min_hum) + "%"
+        canvas.create_text(120, 225, text=hum, fill="white")
+        
         canvas.pack(side=LEFT, fill=X)
+
+##    for i in range(0, len(detailed_day_weather)):
+##        weather = detailed_day_weather[i]
+##        print(weather.day_icon_url, " / ", weather.day_title, " / ", weather.day_description, " / ", weather.eve_icon_url, " / ", weather.eve_title, " / ", weather.eve_description, "\n")
+##
+##        raw_data = urlopen(weather.day_icon_url).read()
+##        im = Image.open(BytesIO(raw_data))
+##        images1.append(ImageTk.PhotoImage(im))
+##
+##        raw_data2 = urlopen(weather.eve_icon_url).read()
+##        im2 = Image.open(BytesIO(raw_data2))
+##        images2.append(ImageTk.PhotoImage(im2))
+##
+##        canvas = Canvas(cadre, width=250, height=400)
+##        canvas.create_rectangle(10, 25, 225, 400)
+##        canvas.create_image(10,25, anchor = NW, image=images1[i])
+##        canvas.create_image(175,25, anchor = NW, image=images2[i])
+##        canvas.pack(side=LEFT, fill=X)
     
 
     main.mainloop()
