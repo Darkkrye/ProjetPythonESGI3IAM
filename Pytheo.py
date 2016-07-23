@@ -12,7 +12,7 @@ import re
 import autocompleteentry as ace
 import modelDetailedDayWeather as mddw
 import modelAllDayWeather as madw
-import guialldayweather as gadw
+import guiweather as gw
 
 from io import BytesIO
 import urllib
@@ -69,7 +69,7 @@ def onCitySelected(value):
             weather = madw.AllDayWeather(day["date"]["day"], day["date"]["weekday"].capitalize(), day["date"]["month"], day["date"]["monthname"].capitalize(), day["date"]["year"], day["high"]["celsius"], day["low"]["celsius"], day["conditions"], day["icon_url"], day["maxwind"]["kph"], day["maxwind"]["dir"], day["avewind"]["kph"], day["avewind"]["dir"], day["maxhumidity"], day["minhumidity"], day["avehumidity"])
             all_day_weather.append(weather)
 
-    gadw.GUIAllDayWeather(all_day_weather, main)
+    gw.GUIWeather(detailed_day_weather, all_day_weather, main)
 
 # Setting redefinitions
 ace.onZipCodeSelected = onZipCodeSelected
@@ -91,7 +91,7 @@ for x in range(0, len(json_obj)):
 if __name__ == '__main__':
     main = Tk()
     main.title("Pythéo")
-    main.geometry("1000x600")
+    main.geometry("1100x600")
 
     cadre = Frame(main, width=768, height=576, borderwidth=1)
     cadre.pack(fill=BOTH)
