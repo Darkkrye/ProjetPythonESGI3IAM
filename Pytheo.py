@@ -15,6 +15,7 @@ import modelAllDayWeather as madw
 import guiweather as gw
 
 from io import BytesIO
+import os
 import urllib
 import urllib.request
 from PIL import Image, ImageTk
@@ -23,8 +24,13 @@ from urllib.request import urlopen
 import json
 
 # - CONSTANTS
+global WG_KEY
+global GUI
+global test
+
 WG_KEY = "e9cf1566c008b39f"
-IS_ALREADY_PASSED = True
+GUI = None
+test = False
 
 # - REDEFINE FUNCTIONS
 # Functions
@@ -46,7 +52,6 @@ def onCitySelected(value):
         value = value.split("-", 1)[0]
         print(value)
     url = "http://api.wunderground.com/api/" + WG_KEY + "/forecast/lang:FR/q/France/" + value + ".json"
-    print(url)
     weather_response = urlopen(url)
     weather_string = weather_response.read().decode('utf-8')
     weather_json_obj = json.loads(weather_string)
@@ -69,7 +74,17 @@ def onCitySelected(value):
             weather = madw.AllDayWeather(day["date"]["day"], day["date"]["weekday"].capitalize(), day["date"]["month"], day["date"]["monthname"].capitalize(), day["date"]["year"], day["high"]["celsius"], day["low"]["celsius"], day["conditions"], day["icon_url"], day["maxwind"]["kph"], day["maxwind"]["dir"], day["avewind"]["kph"], day["avewind"]["dir"], day["maxhumidity"], day["minhumidity"], day["avehumidity"])
             all_day_weather.append(weather)
 
+    try:
+        olderCityFile = open("data/oldCity.txt", "w")
+        olderCityFile.write(value)
+    except:
+        pass
+    finally:
+        if olderCityFile is not None:
+            olderCityFile.close()
+
     gw.GUIWeather(detailed_day_weather, all_day_weather, main)
+        
 
 # Setting redefinitions
 ace.onZipCodeSelected = onZipCodeSelected
@@ -91,15 +106,37 @@ for x in range(0, len(json_obj)):
 if __name__ == '__main__':
     main = Tk()
     main.title("Pythéo")
-    main.geometry("1100x600")
+    main.geometry("1000x550")
 
     cadre = Frame(main, width=768, height=576, borderwidth=1)
     cadre.pack(fill=BOTH)
 
     Label(cadre, text="Bienvenue dans Pythéo").pack(side="top", fill=X)
 
-    Label(cadre, text="Veuillez sélectionner le Code Postal :").pack(side="top", fill=X)
-    entry = ace.AutocompleteEntry(zipCodes, cadre).pack(side="top", fill=Y)
+    
+
+    
+    
+    olderCityFile = None
+
+    try:
+        if os.stat("data/oldCity.txt").st_size != 0:
+            olderCityFile = open("data/oldCity.txt", "r")
+            city = olderCityFile.read()
+            if messagebox.askokcancel("Recharger", "Souhaitez-vous charger votre dernière recherche ? (" + city + ")"):
+                onCitySelected(city)
+            else:
+                Label(cadre, text="Veuillez sélectionner le Code Postal :").pack(side="top", fill=X)
+                entry = ace.AutocompleteEntry(zipCodes, cadre).pack(side="top", fill=Y)
+    except:
+        Label(cadre, text="Veuillez sélectionner le Code Postal :").pack(side="top", fill=X)
+        entry = ace.AutocompleteEntry(zipCodes, cadre).pack(side="top", fill=Y)
+    finally:
+        if olderCityFile is not None:
+            olderCityFile.close()
+
+    
+    
 
     main.mainloop()
 
