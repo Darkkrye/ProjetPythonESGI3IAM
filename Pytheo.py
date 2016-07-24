@@ -74,16 +74,16 @@ def onCitySelected(value):
             weather = madw.AllDayWeather(day["date"]["day"], day["date"]["weekday"].capitalize(), day["date"]["month"], day["date"]["monthname"].capitalize(), day["date"]["year"], day["high"]["celsius"], day["low"]["celsius"], day["conditions"], day["icon_url"], day["maxwind"]["kph"], day["maxwind"]["dir"], day["avewind"]["kph"], day["avewind"]["dir"], day["maxhumidity"], day["minhumidity"], day["avehumidity"])
             all_day_weather.append(weather)
 
-    try:
-        olderCityFile = open("data/oldCity.txt", "w")
-        olderCityFile.write(value)
-    except:
-        pass
-    finally:
-        if olderCityFile is not None:
-            olderCityFile.close()
+        try:
+            olderCityFile = open("data/oldCity.txt", "w")
+            olderCityFile.write(value)
+        except:
+            pass
+        finally:
+            if olderCityFile is not None:
+                olderCityFile.close()
 
-    gw.GUIWeather(detailed_day_weather, all_day_weather, main)
+        gw.GUIWeather(detailed_day_weather, all_day_weather, main)
         
 
 # Setting redefinitions
