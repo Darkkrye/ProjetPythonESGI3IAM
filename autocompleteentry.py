@@ -19,7 +19,7 @@ class AutocompleteEntry(Entry):
             self.var = self["textvariable"] = StringVar()
 
         self.var.trace('w', self.changed)
-        self.bind("<Right>", self.selection)
+        self.bind("<Return>", self.selection)
         self.bind("<Up>", self.up)
         self.bind("<Down>", self.down)
         
